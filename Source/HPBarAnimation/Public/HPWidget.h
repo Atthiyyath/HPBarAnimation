@@ -28,6 +28,12 @@ public:
 	UPROPERTY(Transient, BlueprintReadWrite)
 	int32 BarTarget = 0;
 
+	UPROPERTY(Transient, BlueprintReadWrite)
+	float CurrentHealth;
+
+	UPROPERTY(Transient, BlueprintReadWrite)
+	float MaxHealth;
+	
 	UProgressBar* LastBar;
 	float Target = 0.f;
 	float Start = 0.f;

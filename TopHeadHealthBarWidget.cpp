@@ -77,32 +77,21 @@ void UTopHeadHealthBarWidget::BarPercentUpdate(int32 BarIndexTarget, float Remai
 		
 		FCTween::Play(Start, Target,[=](float t)
 		{
-			if (LastBarIndexSet != AllBars.Num())
-			{
-				UProgressBar* LastBarUpdate = AllBars[LastBarIndexSet];
-				if (LastBarUpdate->GetPercent() <= 0.3f && !OnceLoop /*>= 0.f*/)
-				{
-					OnceLoop = true;
-					float LastBarPercent = LastBarUpdate->GetPercent();
-					FCTween::Play(LastBarPercent, 0.f,[=](float t2)
-					{
-						AllBars[LastBarIndexSet]->SetPercent(t2);
-					}, 1.f, EFCEase::Linear);
-				}
-			}
-			
-			if (t <= 0.3)
+			if (t <= 0.3f)
 			{
 				BarPercentUpdate(BarIndexTarget, Remainer);
-				if (LastBarIndexSet == BarIndexTarget)
+				/*if (LastBarIndexSet == BarIndexTarget)
 				{
-					OnceLoop = false;
-				}
-				return;
+					OnLooping = false;
+				}*/
 			}
 			LastBar->SetPercent(t);
 		},1.f, EFCEase::Linear)->SetOnComplete([=]
 		{
+			if (LastBarIndexSet == BarIndexTarget)
+			{
+				OnLooping = false;
+			}
 			LastBarIndexSet--;
 			BarPercentUpdate(BarIndexTarget, Remainer);
 		});

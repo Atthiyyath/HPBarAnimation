@@ -72,30 +72,33 @@ void UTopHeadHealthBarWidget::BarPercentUpdate(int32 BarIndexTarget, float Remai
 	if (BarIndexTarget < LastBarIndexSet)
 	{
 		UProgressBar* LastBar = AllBars[LastBarIndexSet - 1];
-		auto Target = BarIndexTarget == LastBarIndexSet - 1 ? Remainer : 0.f;
+		End = BarIndexTarget == LastBarIndexSet - 1 ? Remainer : 0.f;
 		auto Start = LastBar->GetPercent();
 		
-		FCTween::Play(Start, Target,[=](float t)
+		FCTween::Play(Start, End,[=](float t)
 		{
-			if (t <= 0.3f)
+			if (LastBarIndexSet > 0 && LastBarIndexSet < AllBars.Num())
 			{
-				BarPercentUpdate(BarIndexTarget, Remainer);
-				/*if (LastBarIndexSet == BarIndexTarget)
+				auto Update = AllBars[LastBarIndexSet]->GetPercent();
+				FCTween::Play(Update, 0.f,[=](float t2)
 				{
-					OnLooping = false;
-				}*/
+					GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Emerald, FString::Printf(TEXT("LastBarIndexSet : %d"), LastBarIndexSet));
+					AllBars[LastBarIndexSet]->SetPercent(t2);
+				}, DurationOnUpdate, EFCEase::Linear);
 			}
+			
+			if (t <= BarLimit)
+			{
+				OnUpdateLastBar();
+				return;
+			}		
 			LastBar->SetPercent(t);
 		},1.f, EFCEase::Linear)->SetOnComplete([=]
 		{
-			if (LastBarIndexSet == BarIndexTarget)
-			{
-				OnLooping = false;
-			}
 			LastBarIndexSet--;
 			BarPercentUpdate(BarIndexTarget, Remainer);
 		});
-	}
+		}
 	else
 	{
 		LastBarIndexSet++;
